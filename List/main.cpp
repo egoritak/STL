@@ -1,7 +1,6 @@
 #include<iostream>
 #include <string>
 #include <cassert>
-#include <typeinfo>
 
 using namespace std;
 
