@@ -1,6 +1,7 @@
 #include<iostream>
 #include <string>
-#include <tuple>
+#include <cassert>
+#include <typeinfo>
 
 using namespace std;
 
@@ -162,40 +163,76 @@ List* devideList(List myList)
 	return	result; 
 }
 
-int main()
+void PushBackTest()
 {
 	List myList;
 
-	for(int i = 1; i <= 10; i++)
+	int pushCount = 1e5;
+	for(int i = 1; i <= pushCount; i++)
 		myList.push_back(i);
 
-	for(int i = 0; i >= -12; i--)
+	int size = 0;
+	int i = 1;
+	for(auto p = myList.begin(); p != nullptr; p = p->next_)
+	{
+		size++;
+		assert(p->value_ == i);
+		i++;
+	}
+	assert(size == pushCount); 
+}
+
+void PushFrontTest()
+{
+	List myList;
+
+	int pushCount = 1e5;
+	for(int i = 1; i <= pushCount; i++)
 		myList.push_front(i);
 
-	for(int i = 11; i <= 12; i++)
-		myList.push_back(i);
+	int size = 0;
+	int i = pushCount;
+	for(auto p = myList.begin(); p != nullptr; p = p->next_)
+	{
+		size++;
+		assert(p->value_ == i);
+		i--;
+	}
+	assert(size == pushCount); 
+}
+template <typename T> std::string type_name();
 
-	cout << myList.toString() << endl;
+void RemoveTest()
+{
+	List myList;
 
-	myList.remove(0);
+	int pushCount = 1e5;
+	for(int i = 1; i <= pushCount; i++)
+	{
+		if(i % 2 == 0)
+			myList.push_back(1);
+		else
+			myList.push_back(2);
+	}
 
-	cout << myList.toString() << endl;
+	for(int i = 1; i <= pushCount/2; i++)
+	{
+		myList.remove(2);
+	}
 
-	myList.push(-1, 0);
+	int size = 0;
+	for(auto p = myList.begin(); p != nullptr; p = p->next_)
+	{
+		size++;
+		assert(p->value_ == 1);
+	}
+	assert(size == pushCount/2); 
+}
 
-	cout << myList.toString() << endl;
-
-	if(myList.exists(-2))
-		cout << "-2 exists" << endl;
-
-	myList.find(-2)->value_ = 9;
-
-	cout << myList.toString() << endl;
-
-	List* devided = devideList(myList);
-
-	cout << devided[0].toString() << endl;
-	cout << devided[1].toString() << endl;
-
+int main()
+{
+	PushBackTest();
+	PushFrontTest();
+	RemoveTest();
 	return 0;
 }
