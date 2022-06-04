@@ -4,6 +4,7 @@
 
 using namespace std;
 
+template <typename T>
 class MyVector
 {
 public:
@@ -12,8 +13,8 @@ public:
 
     explicit MyVector(size_t size) : size_{ size }, capacity_{ size }
     {
-        data_ = new int[size];
-        
+        data_ = new T[size];
+
         fill(data_, data_ + size_, 0);
 
         size_ = size;
@@ -24,7 +25,7 @@ public:
     {
         size_ = other.size();
         capacity_ = other.capacity();
-        data_ = new int[capacity_];
+        data_ = new T[capacity_];
 
         memcpy(&data_, other.data(), size_);
     }
@@ -44,12 +45,12 @@ public:
         return size_;
     }
 
-    int* data() const
+    T* data() const
     {
         return data_;
     }
 
-    int& operator[](size_t i) const
+    T& operator[](size_t i) const
     {
         return data_[i];
     }
@@ -61,7 +62,7 @@ public:
             delete[] data_;
             size_ = other.size();
             capacity_ = other.capacity();
-            data_ = new int[capacity_];
+            data_ = new T[capacity_];
 
             for (size_t i = 0; i < other.size(); i++)
                 data_[i] = other[i];
@@ -69,11 +70,11 @@ public:
         return *this;
     }
 
-    MyVector& operator=(initializer_list<int> ilist)
+    MyVector& operator=(initializer_list<T> ilist)
     {
-        delete [] data_;
+        delete[] data_;
         size_ = ilist.size();
-        data_ = new int[size_];
+        data_ = new T[size_];
         for (size_t i = 0; i < size_; i++)
         {
             data_[i] = *(ilist.begin() + i);
@@ -82,7 +83,7 @@ public:
         return *this;
     }
 
-    void push_back(int val)
+    void push_back(T val)
     {
         int COEFF = 2;
         size_t newCapacity;
@@ -100,7 +101,7 @@ public:
         {
             if (size_ != 0)
             {
-                int* temp = new int[newCapacity];
+                T* temp = new T[newCapacity];
                 for (size_t i = 0; i < size_; ++i)
                 {
                     temp[i] = data_[i];
@@ -114,7 +115,7 @@ public:
             else
             {
                 delete data_;
-                data_ = new int[1];
+                data_ = new T[1];
                 data_[0] = val;
             }
 
@@ -127,7 +128,7 @@ public:
     {
         size_ = 0;
         capacity_ = 0;
-        delete [] data_;
+        delete[] data_;
         data_ = nullptr;
     }
 
@@ -143,12 +144,13 @@ public:
 
     friend ostream& operator<<(ostream& os, const MyVector& myVec);
 private:
-    int* data_ = nullptr;
+    T* data_ = nullptr;
     size_t size_;
-    size_t capacity_; 
+    size_t capacity_;
 };
 
-ostream& operator<<(ostream& os, const MyVector& myVec)
+template <typename T>
+ostream& operator<<(ostream& os, const MyVector<T>& myVec)
 {
     for (size_t i = 0; i < myVec.size(); i++) {
         os << myVec[i];
@@ -158,7 +160,7 @@ ostream& operator<<(ostream& os, const MyVector& myVec)
 
 
 void PushBackTest() {
-    MyVector v;
+    MyVector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
         assert(v.size() == i);
@@ -166,7 +168,7 @@ void PushBackTest() {
 }
 
 void ClearTest() {
-    MyVector v;
+    MyVector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
     }
@@ -179,40 +181,40 @@ void ClearTest() {
 
 
 void EqualTest() {
-    MyVector v;
+    MyVector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
     }
-    MyVector v1;
+    MyVector<int> v1;
     v1 = v;
 
     assert(v.size() == v1.size());
     assert(v.capacity() == v1.capacity());
     assert(v.data() != v1.data());
 
-    for(size_t i = 0; i <= v.size(); ++i)
+    for (size_t i = 0; i <= v.size(); ++i)
         assert(v[i] == v1[i]);
-    
-    v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    v = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     for (int i = 0; i < 15; ++i)
-        assert(v[i] == i+1);
+        assert(v[i] == i + 1);
 }
 
 void BracketsTest() {
-    MyVector v;
+    MyVector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
     }
-    MyVector v1;
+    MyVector<int> v1;
     v1 = v;
     for (size_t i = 1; i < 1e5; ++i) {
-        v[i] = v[i-1];
+        v[i] = v[i - 1];
     }
     for (int i = 1; i < 1e5; ++i) {
         v1[i] = v1[i - 1];
     }
-    for (int i = 1; i < 1e5; ++i) 
+    for (int i = 1; i < 1e5; ++i)
         assert(v[i] == v1[i]);
 }
 
@@ -224,4 +226,3 @@ int main()
     BracketsTest();
     return 0;
 }
-
