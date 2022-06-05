@@ -6,23 +6,26 @@ template <typename T>
 class Stack
 {
 	public:
-	
-	Stack()
+	Stack() : data_{nullptr}, size_ {0}, capacity_{0}
 	{
-		data_ = nullptr;
-		size_ = 0;
 	}
+
 	Stack(const Stack& other)
 	{
 		size_ = other.size();
-		data_ = new T[size_];
+		capacity_ = other.capacity();
+		data_ = new T[capacity_];
 		std::copy(other.data(), other.data() + size_, data_);
 	}
 	const Stack& operator=(const Stack& other)
 	{
+		if(data_ == other.data())
+			return *this;
+
 		delete[] data_;
 		size_ = other.size();
-		data_ = new T[size_];
+		capacity_ = other.capacity();
+		data_ = new T[capacity_];
 		std::copy(other.data(), other.data() + size_, data_);
 
 		return *this;	
@@ -33,6 +36,11 @@ class Stack
 		delete[] data_;
 	}
 
+	bool isFull() const 
+	{
+		return size_ == capacity_;
+	}
+
 	const T* data() const
 	{
 		return data_;
@@ -40,6 +48,9 @@ class Stack
 
 	T& top()
 	{
+		if(size_ == 0)
+			std::runtime_error("stack is empty");
+
 		return data_[size_ - 1];		
 	}
 
@@ -53,54 +64,50 @@ class Stack
 		return size_;
 	}
 
+	size_t capacity() const
+	{
+		return capacity_;
+	}
+
 	void push(T val)
 	{
-		size_++;
-		if(empty())
+		int COEFF = 2;
+		if(isFull())
 		{
-			data_ = new T[size_];
-			data_[0] = val;
-		}
-		else
-		{
-			T* temp = new T[size_];
-			std::copy(data_, data_+size_-1, temp);	
+			if(capacity_ == 0)
+				capacity_ = 1;
+			else
+				capacity_ *= COEFF;
+
+			T* temp = new T[capacity_];
+
+			for(int i = 0; i < size_; i++)
+				temp[i] = data_[i];
+			
+
 			delete[] data_;
-			temp[size_ - 1] = val;
+
 			data_ = temp;
-		}
+		}	
+		
+		data_[size_++] = val;
 	}
 
-	void emplace(T& val)
-	{
-		std::cout << "hizi cho tut delat" << std::endl;	
-	}
-
-	void pop()
+	T pop()
 	{
 		if(empty())
-			return;
+		{
+			std::runtime_error("popping empty stack");
+		}
 
-		T* temp = new T[size_-1];
-		std::copy(data_, data_+size_-1, temp);	
-		delete[] data_;
-		data_ = temp;
-		size_--;
+		return data_[--size_];
 	}
 
 	private:
 	T* data_;
 	size_t size_;
+	size_t capacity_;
 };
-
-/*
-	 * top() // access the top element
-	 * empty()
-	 * size()
-	 * push(T val)
-	 * emplace
-	 * pop
-*/
 
 void CopyConstructorTest()
 {
@@ -177,5 +184,6 @@ int main()
 	PopTest();
 	CopyConstructorTest();
 	EqualTest();
+
 	return 0;
 }
