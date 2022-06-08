@@ -82,46 +82,32 @@ class Queue
 		return data_[front_ - 1];
 	}
 
+	bool isFull() const
+	{
+		return size_ == capacity_;
+	}
+
 	const Queue& push(T val)
 	{
 		int COEFF = 2;
-        size_t newCapacity;
-        if (capacity_ == 0)
-            newCapacity = 1;
-        else
-            newCapacity = capacity_ * COEFF;
+		if(isFull())
+		{
+			if(capacity_ == 0)
+				capacity_ = 1;
+			else
+				capacity_ *= COEFF;
 
-        if (size_ < capacity_)
-        {
-            data_[size_] = val;
-            size_++;
-        }
-        else
-        {
-            if (size_ != 0)
-            {
-                T* temp = new T[newCapacity];
-                for (size_t i = 0; i < size_; ++i)
-                {
-                    temp[i] = data_[i];
-                }
+			T* temp = new T[capacity_];
 
-                temp[size_] = val;
+			for(int i = 0; i < size_; i++)
+				temp[i] = data_[i];
 
-                delete data_;
-                data_ = temp;
-            }
-            else
-            {
-                delete data_;
-                data_ = new T[1];
-                data_[0] = val;
-            }
+			delete[] data_;
 
-            capacity_ = newCapacity;
-            size_++;
-        }
+			data_ = temp;
+		}
 
+		data_[size_++] = val;
 		back_++;
 
 		return *this;
@@ -182,5 +168,6 @@ int main()
 {
 	PushTest();
 	PopTest();
+
 	return 0;
 }

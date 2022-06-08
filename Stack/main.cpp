@@ -84,7 +84,6 @@ class Stack
 			for(int i = 0; i < size_; i++)
 				temp[i] = data_[i];
 			
-
 			delete[] data_;
 
 			data_ = temp;
