@@ -17,6 +17,7 @@ class Stack
 		data_ = new T[capacity_];
 		std::copy(other.data(), other.data() + size_, data_);
 	}
+
 	const Stack& operator=(const Stack& other)
 	{
 		if(data_ == other.data())
