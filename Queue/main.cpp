@@ -4,47 +4,41 @@
 template <typename T>
 class Queue
 {
-	public:
-	Queue() : size_ {0}, capacity_{0}, data_ {nullptr}, front_{0}, back_{-1}
+public:
+	Queue()
 	{
-		
 	}
 
-	explicit Queue(size_t size) : size_{size}
-	{
-		capacity_ = size_;
-		data_ = new T[size_];
+    explicit Queue(size_t size) : size_{ size }, capacity_ { size * COEF }, front_ { -1 }, back_ { -1 }
+    {
+        data_ = new T[capacity_];
+    }
 
-		if(size_ != 0)
-		{
-			front_ = data[0];
-			back_ = data[size_ - 1];
-		}
-	}
-
-	Queue(const Queue& other)
-	{
-		size_ = other.size();
-        capacity_ = other.capacity();
+    Queue(const Queue& other) : size_ {other.size()}, capacity_ { other.capacity() }, back_ { other.back_id() - 1}, front_ {other.front_id()}
+    {
         data_ = new T[capacity_];
 
-		if(size_ != 0)
-		{
-			front_ = data[0];
-			back_ = data[size_ - 1];
-		}
+        std::copy(other.data(), other.data() + size_, data_);
+    }
 
-        memcpy(&data_, other.data(), size_);
-	}
-
-	bool empty() const
-	{
-		return size_ == 0;
-	}
-
-	size_t capacity() const
+    ~Queue()
     {
-        return capacity_;
+        delete[] data_;
+    }
+
+    int back_id() const
+    {
+        return back_;
+    }
+
+    int front_id() const
+    {
+        return front_;
+    }
+
+    bool empty() const
+    {
+        return size_ == 0;
     }
 
     size_t size() const
@@ -52,122 +46,148 @@ class Queue
         return size_;
     }
 
+	size_t capacity() const
+	{
+		return capacity_;	
+	}
+
     T* data() const
     {
         return data_;
     }
 
-	T front() const
+    T front() const
+    {
+        if (empty())
+            throw std::runtime_error ("queue is empty");
+        return data_[front_];
+    }
+
+    T back() const
+    {
+        if (empty())
+            throw std::runtime_error ("queue is empty");
+        return data_[back_];
+    }
+
+    bool isFull() const
+    {
+		return (front_ == 0 && back_ == size_-1) || (back_ == (front_-1)%(size_-1));
+    }
+
+	bool isEmpty() const
 	{
-		if(empty())
-			std::runtime_error("queue is empty");
-		return data_[front_];
+		return front_ == -1;
 	}
 
-	T back() const
-	{
-		if(empty())
-			std::runtime_error("queue is empty");
-		return data_[back_];
-	}
+    T pop()
+    {
+		if (isEmpty())
+            throw std::runtime_error ("Pop failed! Queue is empty\n");
 
-	int pop()
-	{
-		if(empty())
-			std::runtime_error("popping empty queue");
-
-		front_++;
 		size_--;
+   
+		T data = data_[front_]; 
+		data_[front_] = -1; 
 
-		return data_[front_ - 1];
-	}
+		if (front_ == back_)  { 
+			front_ = -1; 
+			back_ = -1; 
+		} 
+		else if (front_ == size_-1) 
+			front_ = 0; 
+		else
+			front_++; 
+   
+		return data; 
+    }
 
-	bool isFull() const
-	{
-		return size_ == capacity_;
-	}
-
-	const Queue& push(T val)
-	{
-		int COEFF = 2;
-		if(isFull())
+    const Queue& push(T val)
+    {
+		if(front_ == 0 && back_ == size_-1)
 		{
-			if(capacity_ == 0)
-				capacity_ = 1;
-			else
-				capacity_ *= COEFF;
+			size_ += 1;
 
-			T* temp = new T[capacity_];
+			if(size_ < capacity_)
+			{
+				capacity_ = size_ * COEF;
 
-			for(int i = 0; i < size_; i++)
-				temp[i] = data_[i];
-
-			delete[] data_;
-
-			data_ = temp;
+				T* temp = new T[capacity_];
+				for(int i = 0; i < size_ - 1; i++)
+					temp[i] = data_[i];
+				delete[] data_;
+				data_ = temp;
+			}
 		}
 
-		data_[size_++] = val;
-		back_++;
+		if (front_ == -1) {     
+			front_ = back_ = 0; 
+			data_[back_] = val; 
+		} 
+		else if (back_ == size_-1 && front_ != 0) { 
+			back_ = 0; 
+			data_[back_] = val; 
+		} 
+		else {  
+			back_++; 
+			data_[back_] = val; 
+		} 
 
-		return *this;
-	}
+        return *this;
+    }
 
-	~Queue()
-	{
-		delete[] data_;
-	}
-
-	private:
-	int front_;
-	int back_;
-	size_t size_;
-	size_t capacity_;
-	T* data_;	
+private:
+	int COEF = 2;
+    int front_;
+    int back_;
+    size_t size_;
+    size_t capacity_;
+    T* data_;
 };
 
-void PushTest()
-{
-	Queue<int> first;
-	for(int i = 1; i <= 100000; i++)
-		first.push(i);
-
-	assert(first.size() == 100000);
-
-	for(int i = 1; i <= 100000 ; i++)
-	{
-		std::cout << first.front() << std::endl;
-		assert(first.front() == i);
-		first.pop();
-	}
-
-	assert(first.size() == 0);
-}
-
-void PopTest()
-{
-	Queue<int> first;
-
-	assert(first.size() == 0 && first.capacity() == 0);
-
-	for(int i = 1; i <= 100000; i++)
-	{
-		first.push(i);
-		assert(first.back() == i);
-	}
-
-	assert(first.size() == 100000);
-
-	for(int i = 1; i <= 100000; i++)
-		first.pop();
-
-	assert(first.size() == 0);
+void PushAndPopTest() {
+    // [0 1 2 3]
+    //  f     b
+    Queue<int> q(4);
+    for (int i = 0; i < 4; ++i) {
+        q.push(i);
+    }
+    assert(q.front_id() == 0);
+    // [x 1 2 3]
+    //    f   b
+    q.pop();
+    assert(q.front_id() == 1);
+    // [4 1 2 3]
+    //  b f
+    q.push(4);
+    // [4 1 2 3 x x x x]
+    //  b f
+    q.push(5);
+    // [4 5 2 3 x x x x]
+    //  b f
+    assert(q.front_id() == 1);
 }
 
 int main()
 {
-	PushTest();
-	PopTest();
+	PushAndPopTest();
 
-	return 0;
+	int size = 10;
+	Queue<int> q_(size);
+
+	for(int i = 1; i <= size; i++)
+	{
+		q_.push(i);
+	}
+	
+	q_.push(88);
+
+	size = q_.size();
+	for(int i = 0; i < size; i++)
+	{
+		std::cout << q_.front() << std::endl;
+		q_.pop();
+	}
+
+    return 0;
 }

@@ -5,13 +5,13 @@
 using namespace std;
 
 template <typename T>
-class MyVector
+class Vector
 {
 public:
 
-    MyVector() : size_{ 0 }, capacity_{ 0 } {}
+    Vector() : size_{ 0 }, capacity_{ 0 } {}
 
-    explicit MyVector(size_t size) : size_{ size }, capacity_{ size }
+    explicit Vector(size_t size) : size_{ size }, capacity_{ size }
     {
         data_ = new T[size];
 
@@ -21,7 +21,7 @@ public:
         capacity_ = size;
     }
 
-    MyVector(const MyVector& other)
+    Vector(const Vector& other)
     {
         size_ = other.size();
         capacity_ = other.capacity();
@@ -30,7 +30,7 @@ public:
         memcpy(&data_, other.data(), size_);
     }
 
-    ~MyVector()
+    ~Vector()
     {
         delete[] data_;
     }
@@ -55,7 +55,7 @@ public:
         return data_[i];
     }
 
-    MyVector& operator=(const MyVector& other)
+    Vector& operator=(const Vector& other)
     {
         if (data_ != other.data())
         {
@@ -70,7 +70,7 @@ public:
         return *this;
     }
 
-    MyVector& operator=(initializer_list<T> ilist)
+    Vector& operator=(initializer_list<T> ilist)
     {
         delete[] data_;
         size_ = ilist.size();
@@ -83,45 +83,31 @@ public:
         return *this;
     }
 
-    void push_back(T val)
-    {
-        int COEFF = 2;
-        size_t newCapacity;
-        if (capacity_ == 0)
-            newCapacity = 1;
-        else
-            newCapacity = capacity_ * COEFF;
+	bool isFull() const
+	{
+		return size_ == capacity_;
+	}
 
-        if (size_ < capacity_)
-        {
-            data_[size_] = val;
-            size_++;
-        }
-        else
-        {
-            if (size_ != 0)
-            {
-                T* temp = new T[newCapacity];
-                for (size_t i = 0; i < size_; ++i)
-                {
-                    temp[i] = data_[i];
-                }
+	void push_back(T val)
+	{
+		if(isFull())
+		{
+			int COEFF = 2;
+			if(capacity_ == 0)
+				capacity_ = 1;
+			else
+				capacity_ *= COEFF;
 
-                temp[size_] = val;
+			T* temp = new T[capacity_];
 
-                delete data_;
-                data_ = temp;
-            }
-            else
-            {
-                delete data_;
-                data_ = new T[1];
-                data_[0] = val;
-            }
+			for(int i = 0; i < size_; i++)
+				temp[i] = data_[i];
+			
+			delete[] data_;
 
-            capacity_ = newCapacity;
-            size_++;
-        }
+			data_ = temp;
+		}	
+		data_[size_++] = val;
     }
 
     void clear()
@@ -142,25 +128,14 @@ public:
         return string(os.str());
     }
 
-    friend ostream& operator<<(ostream& os, const MyVector& myVec);
 private:
     T* data_ = nullptr;
     size_t size_;
     size_t capacity_;
 };
 
-template <typename T>
-ostream& operator<<(ostream& os, const MyVector<T>& myVec)
-{
-    for (size_t i = 0; i < myVec.size(); i++) {
-        os << myVec[i];
-    }
-    return os;
-}
-
-
 void PushBackTest() {
-    MyVector<int> v;
+    Vector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
         assert(v.size() == i);
@@ -168,7 +143,7 @@ void PushBackTest() {
 }
 
 void ClearTest() {
-    MyVector<int> v;
+    Vector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
     }
@@ -181,11 +156,11 @@ void ClearTest() {
 
 
 void EqualTest() {
-    MyVector<int> v;
+    Vector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
     }
-    MyVector<int> v1;
+    Vector<int> v1;
     v1 = v;
 
     assert(v.size() == v1.size());
@@ -202,11 +177,11 @@ void EqualTest() {
 }
 
 void BracketsTest() {
-    MyVector<int> v;
+    Vector<int> v;
     for (size_t i = 1; i <= 1e5; ++i) {
         v.push_back(rand());
     }
-    MyVector<int> v1;
+    Vector<int> v1;
     v1 = v;
     for (size_t i = 1; i < 1e5; ++i) {
         v[i] = v[i - 1];

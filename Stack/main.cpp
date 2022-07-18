@@ -10,10 +10,8 @@ class Stack
 	{
 	}
 
-	Stack(const Stack& other)
+	Stack(const Stack& other) : size_ {other.size()}, capacity_ {other.capacity()}
 	{
-		size_ = other.size();
-		capacity_ = other.capacity();
 		data_ = new T[capacity_];
 		std::copy(other.data(), other.data() + size_, data_);
 	}
@@ -72,9 +70,9 @@ class Stack
 
 	void push(T val)
 	{
-		int COEFF = 2;
 		if(isFull())
 		{
+			int COEFF = 2;
 			if(capacity_ == 0)
 				capacity_ = 1;
 			else
