@@ -5,7 +5,8 @@
 template <typename T>
 class Vector {
 public:
-    Vector() : size_{0}, capacity_{0} {}
+    Vector() : size_{0}, capacity_{0} {
+    }
 
     explicit Vector(size_t size) : size_{size}, capacity_{size} {
         data_ = new T[size];
@@ -24,15 +25,25 @@ public:
         memcpy(&data_, other.data(), size_);
     }
 
-    ~Vector() { delete[] data_; }
+    ~Vector() {
+        delete[] data_;
+    }
 
-    size_t capacity() const { return capacity_; }
+    size_t capacity() const {
+        return capacity_;
+    }
 
-    size_t size() const { return size_; }
+    size_t size() const {
+        return size_;
+    }
 
-    T* data() const { return data_; }
+    T* data() const {
+        return data_;
+    }
 
-    T& operator[](size_t i) const { return data_[i]; }
+    T& operator[](size_t i) const {
+        return data_[i];
+    }
 
     Vector& operator=(const Vector& other) {
         if (data_ != other.data()) {
@@ -58,7 +69,9 @@ public:
         return *this;
     }
 
-    bool isFull() const { return size_ == capacity_; }
+    bool isFull() const {
+        return size_ == capacity_;
+    }
 
     void push_back(T val) {
         if (isFull()) {
