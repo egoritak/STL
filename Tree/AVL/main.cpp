@@ -1,7 +1,8 @@
 #include <iostream>
+#include "test.cpp"
 
-#include "tree2.h"
 
 int main() {
+	TEST_HEIGHT();
     return 0;
 }

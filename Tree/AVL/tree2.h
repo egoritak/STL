@@ -30,6 +30,76 @@ struct Node {
 
 template <typename T>
 class AVLTree {
+public:
+    ~AVLTree() {
+        destroy(root_);
+    }
+
+    T& operator[](const size_t& key) {
+        if (key >= size_node(root_) || key < 0)
+            throw std::runtime_error("Index out of range");
+
+        return order_stat_node(root_, key)->data_;
+    }
+
+    AVLTree& operator=(const AVLTree& other) {
+        if (other.root() != root_) {
+            destroy(root_);
+            root_ = copy_helper(other.root());
+        }
+
+        return *this;
+    }
+
+    AVLTree(const AVLTree& other) {
+        if (other.root() != root_)
+            root_ = copy_helper(other.root());
+    }
+
+    void insert(T val) {
+        root_ = insert_node(root_, val);
+    }
+
+    void remove(T val) {
+        root_ = remove_node(root_, val);
+    }
+
+    size_t height() const {
+        if (root_ == nullptr)
+            return 0;
+
+        return root_->height_;
+    }
+
+    Node<T>* find(T val) {
+        return find_node(root_, val);
+    }
+
+    bool exists(T val) const {
+        return exists_node(root_, val);
+    }
+
+    void print() const {
+        print_node(root_, "", true);
+        std::cout << "\n";
+    }
+
+    void inorder() const {
+        inorder_node(root_);
+        std::cout << "\n";
+    }
+
+    Node<T>* root() const {
+        return root_;
+    }
+
+    size_t size() const {
+        if (root_)
+            return root_->size_;
+        else
+            return 0;
+    }
+
 private:
     Node<T>* right_rotate(Node<T>* parent) {
         Node<T>* l = parent->left_;
@@ -257,78 +327,5 @@ private:
         return new_node;
     }
 
-    Node<T>* root_;
-
-public:
-    AVLTree() : root_{nullptr} {
-    }
-
-    ~AVLTree() {
-        destroy(root_);
-    }
-
-    T& operator[](const size_t& key) {
-        if (key >= size_node(root_) || key < 0)
-            throw std::runtime_error("Index out of range");
-
-        return order_stat_node(root_, key)->data_;
-    }
-
-    AVLTree& operator=(const AVLTree& other) {
-        if (other.root() != root_) {
-            destroy(root_);
-            root_ = copy_helper(other.root());
-        }
-
-        return *this;
-    }
-
-    AVLTree(const AVLTree& other) : root_{nullptr} {
-        if (other.root() != root_)
-            root_ = copy_helper(other.root());
-    }
-
-    void insert(T val) {
-        root_ = insert_node(root_, val);
-    }
-
-    void remove(T val) {
-        root_ = remove_node(root_, val);
-    }
-
-    size_t height() const {
-        if (root_ == nullptr)
-            return 0;
-
-        return root_->height_;
-    }
-
-    Node<T>* find(T val) {
-        return find_node(root_, val);
-    }
-
-    bool exists(T val) const {
-        return exists_node(root_, val);
-    }
-
-    void print() const {
-        print_node(root_, "", true);
-        std::cout << "\n";
-    }
-
-    void inorder() const {
-        inorder_node(root_);
-        std::cout << "\n";
-    }
-
-    Node<T>* root() const {
-        return root_;
-    }
-
-    size_t size() const {
-        if (root_)
-            return root_->size_;
-        else
-            return 0;
-    }
+    Node<T>* root_{nullptr};
 };
