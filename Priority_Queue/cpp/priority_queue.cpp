@@ -19,20 +19,20 @@ public:
         : size_{size}, capacity_{size * COEF} {
         data_ = new T[capacity_];
         std::copy(data, data + size, data_);
-        for (int i = size_ / 2; i >= 0; i--)
+        for (int i = size_ / 2 - 1; i >= 0; i--)
             sift_down(i);
     }
 
     size_t parent(size_t i) const {
-        return i / 2;
+        return i / 2 + 1;
     }
 
     size_t left_child(size_t i) const {
-        return 2 * i;
+        return 2 * i + 1;
     }
 
     size_t right_child(size_t i) const {
-        return 2 * i + 1;
+        return 2 * i + 2;
     }
 
     size_t size() const {

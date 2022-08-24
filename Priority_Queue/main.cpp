@@ -64,7 +64,6 @@ void heapSortTest() {
 }
 
 int main() {
-    // heapSortPQTest();
     heapSortTest();
 
     return 0;
